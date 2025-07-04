@@ -1403,8 +1403,10 @@
             if (!confirm('Are you sure you want to delete this story?')) return;
             stories.splice(currentStoryIndex, 1);
             localStorage.setItem('stories', JSON.stringify(stories));
+            currentStoryIndex = -1;
             closeSettingsModal();
             showDashboard();
+            loadStories();
         }
     </script>
 </body>

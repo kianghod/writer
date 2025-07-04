@@ -1,0 +1,44 @@
+.keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.button {
+  width: 64px;
+  height: 48px;
+  background: #E5E5E5;
+  color: #222222;
+  border: none;
+  border-radius: 4px;
+  font-size: 20px;
+  font-weight: normal;
+  box-shadow: none;
+  transition: background 0.2s;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  touch-action: manipulation;
+}
+.button:hover:not(:disabled),
+.button:focus-visible:not(:disabled) {
+  background: #CCCCCC;
+  outline: 2px solid #007AFF;
+}
+.button:active:not(:disabled) {
+  background: #B0B0B0;
+}
+.button:disabled {
+  background: #F0F0F0;
+  color: #9A9A9A;
+  opacity: 0.5;
+  cursor: not-allowed;
+} 

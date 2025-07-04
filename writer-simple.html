@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writer App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #FFFFFF;
+            color: #000000;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 200px 0;
+        }
+
+        /* Passcode Screen */
+        .passcodeScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .passcodeTitle {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .passcodeDisplay {
+            font-size: 32px;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 40px;
+            letter-spacing: 8px;
+            min-height: 40px;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 280px;
+            width: 100%;
+        }
+
+        .keypadBtn {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #000000;
+            background: #FFFFFF;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .keypadBtn:hover {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .keypadBtn:active {
+            background: #000000;
+            color: #FFFFFF;
+            transform: scale(0.95);
+        }
+
+        .keypadBtn.clear {
+            font-size: 18px;
+        }
+
+        .keypadBtn.submit {
+            font-size: 20px;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboardHeader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding: 0 10px;
+        }
+
+        .dashboardTitle {
+            font-size: 28px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .addStoryBtn {
+            width: 44px;
+            height: 44px;
+            border: 2px solid #000000;
+            background: #FFFFFF;
+            color: #000000;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .addStoryBtn:hover {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .storiesGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 0 10px;
+        }
+
+        .storyCard {
+            width: 300px;
+            height: 400px;
+            background: #F5F5F5;
+            border: 2px solid #000000;
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 16px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .storyCard:hover {
+            background: #E0E0E0;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .storyCard:active {
+            transform: translateY(-2px);
+        }
+
+        .spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 16px;
+            height: 100%;
+            background: #000000;
+            z-index: 2;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .pageEdge {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 8px;
+            height: 100%;
+            background: #FFFFFF;
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 2;
+            border-left: 1px solid #000000;
+        }
+
+        /* Cover patterns */
+        .coverPattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            opacity: 0.1;
+        }
+
+        .pattern-dots {
+            background-image: radial-gradient(circle, #000000 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .pattern-stripes {
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                #000000 10px,
+                #000000 20px
+            );
+        }
+
+        .pattern-grid {
+            background-image: 
+                linear-gradient(#000000 1px, transparent 1px),
+                linear-gradient(90deg, #000000 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .pattern-zigzag {
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                #000000 10px,
+                #000000 20px
+            );
+            background-size: 40px 40px;
+        }
+
+        .cardTitle {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000000;
+            position: relative;
+            z-index: 3;
+            margin-left: 8px;
+            margin-top: 0;
+        }
+
+        .cardDate {
+            font-size: 12px;
+            color: #666666;
+            position: relative;
+            z-index: 3;
+            margin-left: 8px;
+            margin-top: 4px;
+        }
+
+        .emptyState {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666666;
+        }
+
+        .emptyState h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .emptyState p {
+            font-size: 16px;
+        }
+
+        /* Story Editor */
+        .storyEditor {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .editorHeader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 0 10px;
+        }
+
+        .backBtn {
+            width: 44px;
+            height: 44px;
+            background: none;
+            border: 2px solid #000000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .backBtn:hover {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .backBtn:hover svg path {
+            stroke: #FFFFFF;
+        }
+
+        .storyTitle {
+            font-size: 20px;
+            font-weight: 600;
+            color: #000000;
+            text-align: center;
+            flex: 1;
+            margin: 0 16px;
+            border: none;
+            background: transparent;
+            outline: none;
+        }
+
+        .storyTitle:focus {
+            outline: 2px solid #000000;
+            border-radius: 4px;
+        }
+
+        .settingsBtn {
+            width: 44px;
+            height: 44px;
+            background: none;
+            border: 2px solid #000000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .settingsBtn:hover {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .settingsBtn:hover svg path {
+            stroke: #FFFFFF;
+        }
+
+        .settingsDropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #FFFFFF;
+            border: 2px solid #000000;
+            border-radius: 8px;
+            padding: 8px 0;
+            min-width: 160px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .settingsDropdown.show {
+            display: block;
+        }
+
+        .dropdownItem {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #000000;
+            transition: background 0.2s;
+        }
+
+        .dropdownItem:hover {
+            background: #F0F0F0;
+        }
+
+        .dropdownItem.active {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        /* Settings Modal */
+        .modalOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modalOverlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .settingsModal {
+            background: #FFFFFF;
+            border: 2px solid #000000;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            height: 80%;
+            max-height: 600px;
+            display: flex;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modalOverlay.show .settingsModal {
+            transform: scale(1);
+        }
+
+        .settingsSidebar {
+            width: 200px;
+            background: #F5F5F5;
+            border-right: 2px solid #000000;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .sidebarMenuItem {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #000000;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebarMenuItem:hover {
+            background: #E0E0E0;
+        }
+
+        .sidebarMenuItem.active {
+            background: #000000;
+            color: #FFFFFF;
+            border-left-color: #FFFFFF;
+        }
+
+        .settingsContent {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .settingsSection {
+            display: none;
+        }
+
+        .settingsSection.active {
+            display: block;
+        }
+
+        .sectionTitle {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        .sectionDescription {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .optionGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .optionCard {
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #FFFFFF;
+        }
+
+        .optionCard:hover {
+            border-color: #000000;
+        }
+
+        .optionCard.active {
+            border-color: #000000;
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .optionPreview {
+            width: 80px;
+            height: 60px;
+            margin: 0 auto 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            background: #F5F5F5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pattern-preview-dots {
+            background-image: radial-gradient(circle, #000000 2px, transparent 2px);
+            background-size: 12px 12px;
+        }
+
+        .pattern-preview-stripes {
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 6px,
+                #000000 6px,
+                #000000 12px
+            );
+        }
+
+        .pattern-preview-grid {
+            background-image: 
+                linear-gradient(#000000 1px, transparent 1px),
+                linear-gradient(90deg, #000000 1px, transparent 1px);
+            background-size: 12px 12px;
+        }
+
+        .pattern-preview-zigzag {
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 8px,
+                #000000 8px,
+                #000000 16px
+            );
+            background-size: 24px 24px;
+        }
+
+        .fontSizePreview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .fontSizeExample {
+            font-family: inherit;
+            font-weight: 600;
+            color: #000000;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .closeModalBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background: none;
+            border: 2px solid #000000;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .closeModalBtn:hover {
+            background: #000000;
+            color: #FFFFFF;
+        }
+
+        .editorArea {
+            position: relative;
+            background: #FFFFFF;
+            min-height: 500px;
+            padding: 20px;
+        }
+
+        .linedPaper {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .line {
+            border-bottom: 1px solid #E0E0E0;
+            height: 28px;
+            margin-bottom: 0;
+        }
+
+        .storyContent {
+            width: 100%;
+            min-height: 460px;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 16px;
+            font-family: inherit;
+            color: #000000;
+            background: transparent;
+            position: relative;
+            z-index: 2;
+            line-height: 28px;
+            padding: 0;
+        }
+
+        .storyContent::placeholder {
+            color: #999999;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .storiesGrid {
+                grid-template-columns: 1fr;
+                padding: 0 5px;
+            }
+            
+            .storyCard {
+                max-width: 100%;
+            }
+            
+            .dashboardHeader {
+                padding: 0 5px;
+            }
+            
+            .editorHeader {
+                padding: 0 5px;
+                flex-direction: row;
+                gap: 12px;
+                align-items: center;
+                position: relative;
+            }
+            
+            .storyTitle {
+                margin: 0;
+                font-size: 18px;
+                text-align: center;
+                flex: 1;
+            }
+
+            .backBtn {
+                width: 40px;
+                height: 40px;
+                flex-shrink: 0;
+            }
+
+            .settingsBtn {
+                width: 40px;
+                height: 40px;
+                flex-shrink: 0;
+            }
+            
+            .storyEditor {
+                padding: 10px;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .editorArea {
+                padding: 15px;
+                min-height: 400px;
+            }
+            
+            .linedPaper {
+                top: 15px;
+                left: 15px;
+                right: 15px;
+                bottom: 15px;
+            }
+            
+            .storyContent {
+                min-height: 350px;
+                font-size: 16px;
+                line-height: 24px;
+            }
+
+            /* Settings Modal Mobile */
+            .settingsModal {
+                width: 95%;
+                height: 90%;
+                max-height: 80vh;
+                flex-direction: column;
+            }
+
+            .settingsSidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid #000000;
+                padding: 10px 0;
+                display: flex;
+                overflow-x: auto;
+            }
+
+            .sidebarMenuItem {
+                padding: 8px 16px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .settingsContent {
+                padding: 20px;
+                flex: 1;
+            }
+
+            .optionGrid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 12px;
+            }
+
+            .optionPreview {
+                width: 60px;
+                height: 45px;
+            }
+
+            .sectionTitle {
+                font-size: 20px;
+            }
+
+            .sectionDescription {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .editorHeader {
+                padding: 0 2px;
+                gap: 8px;
+            }
+
+            .storyTitle {
+                font-size: 16px;
+            }
+
+            .backBtn {
+                width: 36px;
+                height: 36px;
+            }
+
+            .settingsBtn {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .storyEditor {
+                padding: 5px;
+            }
+            
+            .editorArea {
+                padding: 10px;
+                min-height: 350px;
+            }
+            
+            .storyContent {
+                min-height: 300px;
+                font-size: 15px;
+            }
+
+            .settingsModal {
+                width: 98%;
+                height: 95%;
+            }
+
+            .settingsContent {
+                padding: 15px;
+            }
+
+            .optionGrid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .optionPreview {
+                width: 50px;
+                height: 40px;
+            }
+        }
+
+        /* Error state for passcode */
+        .error {
+            color: #000000;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Passcode Screen -->
+    <div id="passcodeScreen" class="passcodeScreen">
+        <h1 class="passcodeTitle">Enter Passcode</h1>
+        <div class="passcodeDisplay" id="passcodeDisplay">••••</div>
+        <div class="keypad">
+            <button class="keypadBtn" onclick="addDigit('1')">1</button>
+            <button class="keypadBtn" onclick="addDigit('2')">2</button>
+            <button class="keypadBtn" onclick="addDigit('3')">3</button>
+            <button class="keypadBtn" onclick="addDigit('4')">4</button>
+            <button class="keypadBtn" onclick="addDigit('5')">5</button>
+            <button class="keypadBtn" onclick="addDigit('6')">6</button>
+            <button class="keypadBtn" onclick="addDigit('7')">7</button>
+            <button class="keypadBtn" onclick="addDigit('8')">8</button>
+            <button class="keypadBtn" onclick="addDigit('9')">9</button>
+            <button class="keypadBtn clear" onclick="clearPasscode()">C</button>
+            <button class="keypadBtn" onclick="addDigit('0')">0</button>
+            <button class="keypadBtn submit" onclick="submitPasscode()">✓</button>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="container hidden">
+        <div class="dashboard">
+            <div class="dashboardHeader">
+                <h1 class="dashboardTitle">Write</h1>
+                <button class="addStoryBtn" onclick="createNewStory()" aria-label="Add new story">+</button>
+            </div>
+            <div class="storiesGrid" id="storiesGrid">
+                <!-- Stories will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Editor -->
+    <div id="storyEditor" class="container hidden">
+        <div class="storyEditor">
+            <div class="editorHeader">
+                <button class="backBtn" onclick="showDashboard()" aria-label="Back to stories">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18l-6-6 6-6" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <input class="storyTitle" id="storyTitle" placeholder="Untitled Story" maxlength="60">
+                <button class="settingsBtn" onclick="openSettingsModal()" aria-label="Story settings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="#000000" stroke-width="2"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke="#000000" stroke-width="2"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="editorArea">
+                <div class="linedPaper" id="linedPaper">
+                    <!-- Lines will be added here -->
+                </div>
+                <textarea class="storyContent" id="storyContent" placeholder="Start writing your story..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modalOverlay" id="settingsModal">
+        <div class="settingsModal">
+            <button class="closeModalBtn" onclick="closeSettingsModal()" aria-label="Close settings">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            
+            <div class="settingsSidebar">
+                <div class="sidebarMenuItem active" onclick="showSettingsSection('cover')">Cover Pattern</div>
+                <div class="sidebarMenuItem" onclick="showSettingsSection('font')">Font Size</div>
+            </div>
+            
+            <div class="settingsContent">
+                <!-- Cover Pattern Section -->
+                <div class="settingsSection active" id="coverSection">
+                    <h2 class="sectionTitle">Cover Pattern</h2>
+                    <p class="sectionDescription">Choose a decorative pattern for your story's cover. The pattern will appear as a subtle background on your story card.</p>
+                    
+                    <div class="optionGrid">
+                        <div class="optionCard" onclick="selectCoverPattern('none')">
+                            <div class="optionPreview"></div>
+                            <div>No Pattern</div>
+                        </div>
+                        <div class="optionCard" onclick="selectCoverPattern('dots')">
+                            <div class="optionPreview pattern-preview-dots"></div>
+                            <div>Dots</div>
+                        </div>
+                        <div class="optionCard" onclick="selectCoverPattern('stripes')">
+                            <div class="optionPreview pattern-preview-stripes"></div>
+                            <div>Stripes</div>
+                        </div>
+                        <div class="optionCard" onclick="selectCoverPattern('grid')">
+                            <div class="optionPreview pattern-preview-grid"></div>
+                            <div>Grid</div>
+                        </div>
+                        <div class="optionCard" onclick="selectCoverPattern('zigzag')">
+                            <div class="optionPreview pattern-preview-zigzag"></div>
+                            <div>Zigzag</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Font Size Section -->
+                <div class="settingsSection" id="fontSection">
+                    <h2 class="sectionTitle">Font Size</h2>
+                    <p class="sectionDescription">Adjust the text size in your story editor. Choose the size that's most comfortable for your reading and writing experience.</p>
+                    
+                    <div class="optionGrid">
+                        <div class="optionCard" onclick="selectFontSize('small')">
+                            <div class="optionPreview">
+                                <div class="fontSizeExample" style="font-size: 12px;">Aa</div>
+                            </div>
+                            <div>Small</div>
+                        </div>
+                        <div class="optionCard" onclick="selectFontSize('medium')">
+                            <div class="optionPreview">
+                                <div class="fontSizeExample" style="font-size: 16px;">Aa</div>
+                            </div>
+                            <div>Medium</div>
+                        </div>
+                        <div class="optionCard" onclick="selectFontSize('large')">
+                            <div class="optionPreview">
+                                <div class="fontSizeExample" style="font-size: 20px;">Aa</div>
+                            </div>
+                            <div>Large</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App state
+        let currentPasscode = '';
+        let stories = JSON.parse(localStorage.getItem('stories') || '[]');
+        let currentStoryIndex = -1;
+        let isNewStory = false;
+        let currentStoryCoverPattern = null;
+        let currentStoryFontSize = 'medium';
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            createLinedPaper();
+            loadStories();
+            
+            // Keyboard support for passcode
+            document.addEventListener('keydown', function(event) {
+                if (document.getElementById('passcodeScreen').classList.contains('hidden')) return;
+                
+                if (event.key >= '0' && event.key <= '9') {
+                    addDigit(event.key);
+                } else if (event.key === 'Enter') {
+                    submitPasscode();
+                } else if (event.key === 'Backspace' || event.key === 'Delete') {
+                    clearPasscode();
+                }
+            });
+
+            // Close settings modal when clicking outside
+            document.addEventListener('click', function(event) {
+                const modal = document.getElementById('settingsModal');
+                const modalContent = document.querySelector('.settingsModal');
+                
+                if (event.target === modal) {
+                    closeSettingsModal();
+                }
+            });
+
+            // Auto-save on page unload
+            window.addEventListener('beforeunload', function() {
+                saveStory();
+            });
+
+            // Auto-save on visibility change (tab switching)
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    saveStory();
+                }
+            });
+        });
+
+        // Passcode functions
+        function addDigit(digit) {
+            if (currentPasscode.length < 4) {
+                currentPasscode += digit;
+                updatePasscodeDisplay();
+            }
+        }
+
+        function clearPasscode() {
+            currentPasscode = '';
+            updatePasscodeDisplay();
+            removeErrorState();
+        }
+
+        function updatePasscodeDisplay() {
+            const display = document.getElementById('passcodeDisplay');
+            display.textContent = '•'.repeat(currentPasscode.length) + '○'.repeat(4 - currentPasscode.length);
+            removeErrorState();
+        }
+
+        function submitPasscode() {
+            if (currentPasscode === '1234') {
+                showDashboard();
+            } else {
+                showErrorState();
+                setTimeout(clearPasscode, 1000);
+            }
+        }
+
+        function showErrorState() {
+            const display = document.getElementById('passcodeDisplay');
+            display.classList.add('error');
+        }
+
+        function removeErrorState() {
+            const display = document.getElementById('passcodeDisplay');
+            display.classList.remove('error');
+        }
+
+        // Navigation functions
+        function showDashboard() {
+            document.getElementById('passcodeScreen').classList.add('hidden');
+            document.getElementById('storyEditor').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            loadStories();
+        }
+
+        function showStoryEditor(index) {
+            currentStoryIndex = index;
+            isNewStory = false;
+            
+            if (index >= 0 && index < stories.length) {
+                const story = stories[index];
+                document.getElementById('storyTitle').value = story.title;
+                document.getElementById('storyContent').value = story.body;
+                updateCoverPatternDisplay(story.coverPattern || 'none');
+                updateFontSizeDisplay(story.fontSize || 'medium');
+                
+                // Apply font size
+                const storyContent = document.getElementById('storyContent');
+                const fontSize = story.fontSize || 'medium';
+                if (fontSize === 'small') {
+                    storyContent.style.fontSize = '14px';
+                } else if (fontSize === 'medium') {
+                    storyContent.style.fontSize = '16px';
+                } else if (fontSize === 'large') {
+                    storyContent.style.fontSize = '18px';
+                }
+            }
+            
+            document.getElementById('passcodeScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('storyEditor').classList.remove('hidden');
+        }
+
+        function createNewStory() {
+            currentStoryIndex = -1;
+            isNewStory = true;
+            document.getElementById('storyTitle').value = '';
+            document.getElementById('storyContent').value = '';
+            updateCoverPatternDisplay('none');
+            updateFontSizeDisplay('medium');
+            
+            // Reset font size to default
+            document.getElementById('storyContent').style.fontSize = '16px';
+            
+            document.getElementById('passcodeScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('storyEditor').classList.remove('hidden');
+        }
+
+        // Settings functions
+        function openSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.add('show');
+            updateModalSelections();
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.remove('show');
+        }
+
+        function showSettingsSection(section) {
+            // Update sidebar menu
+            const menuItems = document.querySelectorAll('.sidebarMenuItem');
+            menuItems.forEach(item => item.classList.remove('active'));
+            
+            const activeMenuItem = Array.from(menuItems).find(item => 
+                item.textContent.toLowerCase().includes(section === 'cover' ? 'cover' : 'font')
+            );
+            if (activeMenuItem) {
+                activeMenuItem.classList.add('active');
+            }
+            
+            // Update content sections
+            const sections = document.querySelectorAll('.settingsSection');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            if (section === 'cover') {
+                document.getElementById('coverSection').classList.add('active');
+            } else if (section === 'font') {
+                document.getElementById('fontSection').classList.add('active');
+            }
+        }
+
+        function updateModalSelections() {
+            // Update cover pattern selection
+            const currentPattern = currentStoryIndex >= 0 && currentStoryIndex < stories.length 
+                ? stories[currentStoryIndex].coverPattern || 'none'
+                : currentStoryCoverPattern || 'none';
+            
+            const coverCards = document.querySelectorAll('#coverSection .optionCard');
+            coverCards.forEach(card => card.classList.remove('active'));
+            
+            const activeCoverCard = Array.from(coverCards).find(card => 
+                card.textContent.toLowerCase().includes(currentPattern === 'none' ? 'no pattern' : currentPattern)
+            );
+            if (activeCoverCard) {
+                activeCoverCard.classList.add('active');
+            }
+            
+            // Update font size selection
+            const currentFontSize = currentStoryIndex >= 0 && currentStoryIndex < stories.length 
+                ? stories[currentStoryIndex].fontSize || 'medium'
+                : currentStoryFontSize || 'medium';
+            
+            const fontCards = document.querySelectorAll('#fontSection .optionCard');
+            fontCards.forEach(card => card.classList.remove('active'));
+            
+            const activeFontCard = Array.from(fontCards).find(card => 
+                card.textContent.toLowerCase().includes(currentFontSize)
+            );
+            if (activeFontCard) {
+                activeFontCard.classList.add('active');
+            }
+        }
+
+        function selectCoverPattern(pattern) {
+            // Update modal display for cover patterns
+            const coverCards = document.querySelectorAll('#coverSection .optionCard');
+            coverCards.forEach(card => card.classList.remove('active'));
+            
+            const selectedCard = Array.from(coverCards).find(card => 
+                card.textContent.toLowerCase().includes(pattern === 'none' ? 'no pattern' : pattern)
+            );
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+            }
+            
+            // Save pattern to current story
+            if (currentStoryIndex >= 0 && currentStoryIndex < stories.length) {
+                stories[currentStoryIndex].coverPattern = pattern;
+                saveStory();
+            } else if (isNewStory) {
+                currentStoryCoverPattern = pattern;
+            }
+            
+            // Update display
+            loadStories();
+        }
+
+        function selectFontSize(size) {
+            // Update modal display for font sizes
+            const fontCards = document.querySelectorAll('#fontSection .optionCard');
+            fontCards.forEach(card => card.classList.remove('active'));
+            
+            const selectedCard = Array.from(fontCards).find(card => 
+                card.textContent.toLowerCase().includes(size)
+            );
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+            }
+            
+            // Apply font size to story content
+            const storyContent = document.getElementById('storyContent');
+            if (size === 'small') {
+                storyContent.style.fontSize = '14px';
+            } else if (size === 'medium') {
+                storyContent.style.fontSize = '16px';
+            } else if (size === 'large') {
+                storyContent.style.fontSize = '18px';
+            }
+            
+            // Save font size to current story
+            if (currentStoryIndex >= 0 && currentStoryIndex < stories.length) {
+                stories[currentStoryIndex].fontSize = size;
+                saveStory();
+            } else if (isNewStory) {
+                currentStoryFontSize = size;
+            }
+        }
+
+        function updateCoverPatternDisplay(pattern) {
+            // This function is now handled by updateModalSelections()
+        }
+
+        function updateFontSizeDisplay(size) {
+            // This function is now handled by updateModalSelections()
+        }
+
+        // Story management
+        function loadStories() {
+            const grid = document.getElementById('storiesGrid');
+            grid.innerHTML = '';
+            
+            if (stories.length === 0) {
+                grid.innerHTML = `
+                    <div class="emptyState">
+                        <h3>No stories yet</h3>
+                        <p>Tap the + button to create your first story</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            stories.forEach((story, index) => {
+                const card = document.createElement('div');
+                card.className = 'storyCard';
+                card.onclick = () => showStoryEditor(index);
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                
+                const date = new Date(story.updatedAt || story.createdAt);
+                const dateStr = date.toLocaleDateString();
+                
+                let coverPatternHtml = '';
+                if (story.coverPattern && story.coverPattern !== 'none') {
+                    coverPatternHtml = `<div class="coverPattern pattern-${story.coverPattern}"></div>`;
+                }
+                
+                card.innerHTML = `
+                    <div class="spine"></div>
+                    <div class="pageEdge"></div>
+                    ${coverPatternHtml}
+                    <div>
+                        <div class="cardTitle">${story.title}</div>
+                        <div class="cardDate">${dateStr}</div>
+                    </div>
+                `;
+                
+                // Keyboard support
+                card.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        showStoryEditor(index);
+                    }
+                });
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function saveStory() {
+            const title = document.getElementById('storyTitle').value || 'Untitled Story';
+            const body = document.getElementById('storyContent').value;
+            
+            if (isNewStory || currentStoryIndex === -1) {
+                const newStory = {
+                    title: title,
+                    body: body,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    coverPattern: currentStoryCoverPattern || 'none',
+                    fontSize: currentStoryFontSize || 'medium'
+                };
+                stories.push(newStory);
+                currentStoryIndex = stories.length - 1;
+                isNewStory = false;
+                currentStoryCoverPattern = null;
+            } else {
+                stories[currentStoryIndex] = {
+                    ...stories[currentStoryIndex],
+                    title: title,
+                    body: body,
+                    updatedAt: new Date().toISOString()
+                };
+            }
+            
+            // Save to localStorage immediately
+            localStorage.setItem('stories', JSON.stringify(stories));
+        }
+
+        // Utility functions
+        function createLinedPaper() {
+            const paper = document.getElementById('linedPaper');
+            for (let i = 0; i < 20; i++) {
+                const line = document.createElement('div');
+                line.className = 'line';
+                paper.appendChild(line);
+            }
+        }
+
+        // Auto-save
+        document.getElementById('storyTitle').addEventListener('input', saveStory);
+        document.getElementById('storyContent').addEventListener('input', saveStory);
+
+        // Auto-save on blur
+        document.getElementById('storyTitle').addEventListener('blur', saveStory);
+        document.getElementById('storyContent').addEventListener('blur', saveStory);
+    </script>
+</body>
+</html> 

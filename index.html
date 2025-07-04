@@ -437,6 +437,7 @@
             border-right: 2px solid #000000;
             padding: 20px 0;
             overflow-y: auto;
+            position: relative;
         }
 
         .sidebarMenuItem {
@@ -832,6 +833,31 @@
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
+
+        .sidebarDeleteWrapper {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .sidebarDeleteBtn {
+            background: #fff;
+            color: #c00;
+            border: 2px solid #c00;
+            border-radius: 8px;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebarDeleteBtn:hover, .sidebarDeleteBtn:focus {
+            background: #c00;
+            color: #fff;
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -906,6 +932,9 @@
             <div class="settingsSidebar">
                 <div class="sidebarMenuItem active" onclick="showSettingsSection('cover')">Cover Pattern</div>
                 <div class="sidebarMenuItem" onclick="showSettingsSection('font')">Font Size</div>
+                <div class="sidebarDeleteWrapper">
+                    <button id="deleteStoryBtn" onclick="deleteCurrentStory()" class="sidebarDeleteBtn">Delete Story</button>
+                </div>
             </div>
             
             <div class="settingsContent">
@@ -963,10 +992,6 @@
                             <div>Large</div>
                         </div>
                     </div>
-                </div>
-                <!-- Delete Story Button -->
-                <div style="margin-top:40px; text-align:center;">
-                    <button id="deleteStoryBtn" onclick="deleteCurrentStory()" style="background:#fff; color:#c00; border:2px solid #c00; border-radius:8px; padding:12px 28px; font-size:16px; font-weight:600; cursor:pointer; transition:background 0.2s;">Delete Story</button>
                 </div>
             </div>
         </div>

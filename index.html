@@ -634,7 +634,10 @@
             line-height: 28px;
             padding: 0;
             letter-spacing: 0.5px;
-            white-space: pre;
+            white-space: pre-line;
+            overflow-y: auto;
+            overflow-x: hidden;
+            word-break: break-word;
         }
 
         .storyContent::placeholder {
@@ -924,7 +927,7 @@
                 <div class="linedPaper" id="linedPaper">
                     <!-- Lines will be added here -->
                 </div>
-                <textarea class="storyContent" id="storyContent" placeholder="Start writing your story..."></textarea>
+                <textarea class="storyContent" id="storyContent" placeholder="Start writing your story..." wrap="soft"></textarea>
             </div>
         </div>
     </div>

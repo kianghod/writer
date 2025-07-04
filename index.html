@@ -35,42 +35,50 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            background: #fff;
         }
 
         .passcodeTitle {
-            font-size: 24px;
-            font-weight: 600;
-            color: #000000;
-            margin-bottom: 40px;
-            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
         }
 
         .passcodeDisplay {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
-            color: #000000;
-            margin-bottom: 40px;
-            letter-spacing: 8px;
-            min-height: 40px;
+            color: #000;
+            margin-bottom: 32px;
+            letter-spacing: 16px;
+            min-height: 48px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 16px 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            max-width: 280px;
+            gap: 20px;
+            max-width: 320px;
             width: 100%;
         }
 
         .keypadBtn {
-            width: 80px;
-            height: 80px;
-            border: 2px solid #000000;
-            background: #FFFFFF;
-            border-radius: 12px;
-            font-size: 24px;
-            font-weight: 600;
-            color: #000000;
+            width: 90px;
+            height: 90px;
+            border: 2px solid #000;
+            background: #fff;
+            border-radius: 16px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #000;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -78,22 +86,12 @@
             justify-content: center;
         }
 
-        .keypadBtn:hover {
-            background: #000000;
-            color: #FFFFFF;
-        }
-
-        .keypadBtn:active {
-            background: #000000;
-            color: #FFFFFF;
-            transform: scale(0.95);
+        .keypadBtn:hover, .keypadBtn:active {
+            background: #000;
+            color: #fff;
         }
 
         .keypadBtn.clear {
-            font-size: 18px;
-        }
-
-        .keypadBtn.submit {
             font-size: 20px;
         }
 
@@ -811,6 +809,18 @@
             }
         }
 
+        @media (max-width: 600px) {
+            .keypadBtn {
+                width: 60px;
+                height: 60px;
+                font-size: 22px;
+            }
+            .passcodeDisplay {
+                font-size: 28px;
+                padding: 10px 16px;
+            }
+        }
+
         /* Error state for passcode */
         .error {
             color: #000000;
@@ -839,9 +849,9 @@
             <button class="keypadBtn" onclick="addDigit('7')">7</button>
             <button class="keypadBtn" onclick="addDigit('8')">8</button>
             <button class="keypadBtn" onclick="addDigit('9')">9</button>
-            <button class="keypadBtn clear" onclick="clearPasscode()">C</button>
+            <div></div>
             <button class="keypadBtn" onclick="addDigit('0')">0</button>
-            <button class="keypadBtn submit" onclick="submitPasscode()">✓</button>
+            <button class="keypadBtn clear" onclick="clearPasscode()">C</button>
         </div>
     </div>
 
@@ -1013,6 +1023,9 @@
             if (currentPasscode.length < 4) {
                 currentPasscode += digit;
                 updatePasscodeDisplay();
+                if (currentPasscode.length === 4) {
+                    setTimeout(submitPasscode, 150); // slight delay for UX
+                }
             }
         }
 
